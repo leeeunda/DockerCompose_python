@@ -1,0 +1,47 @@
+# docker-compose는 항상 version tag로 시작
+# 최근 버전인 "3"을 사용
+version: "3"
+
+# 1 service = 1 container
+# 'services'로 서비스 생성 
+services:
+  # server와 client 두 가지 service를 생성
+
+  # 첫번째 service(container): server 정의
+  server:
+    # build : 이미지를 만드는 데 사용할 dockerfile의 경로 지정.
+    # service를 실행하는 역할.
+    build: ./server/
+    #server의 image 이름 정의
+    image: leeeunda/server:1.0
+
+    # 이미지가 생성되면 한 번 실행되는 명령어
+    # python ./server.py를 실행
+    command: python ./server.py
+
+    # server.py에서 port를 1234로 지정
+    # 컨테이너 외부에서 서버에 액세스 하기 위함
+    #[컴퓨터에서 원하는 포트]:[컨테이너에서 검색하려는 포트]
+    ports:
+      - 1234:1234
+
+
+
+  # 두번째 service(container): client 정의
+  client:
+    build: ./client/
+    #client의 image 정의
+    image: leeeunda/client:1.0
+    
+    # build : 이미지를 만드는 데 사용할 dockerfile의 경로 지정.
+    # service를 실행하는 역할.
+    command: python ./client.py
+
+    #네트워크 유형을 정의
+    #컨테이너가 컴퓨터의 'localhost'에 액세스할 수 있음을 정의
+    network_mode: host
+
+    # depends_on : 서비스 여부를 정의
+    # client service가 server service가 ready될 때까지 기다리도록 함.
+    depends_on:
+      - server
